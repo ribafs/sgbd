@@ -1,0 +1,115 @@
+== Criação do usuário us_dnocs - super usuário para administrar o banco db_intranet
+
+ssh ribamar.sousa@10.0.0.60
+
+sudo su
+su - postgres
+psql
+
+CREATE ROLE us_dnocs WITH LOGIN SUPERUSER PASSWORD 'zmxn1029D@';
+
+Listar usuários
+\du
+
+Sair do psql
+\q
+
+Conectar ao banco postgres (precisamos indicar um banco, pois não existe o banco user_dnocs)
+psql -U us_dnocs -d postgres
+
+Agora ele pede a senha e consegue efetuar o login
+
+
+== Agora irei criar um grupo de usuários/role chamado "gr_intranet" que se destinará a criação dos usuários para cada esquema do db_intranet
+
+Será criado com o usuário us_dnocs e não precisamos dar senha a ele, pois não faremos login, apenas com os que serão criados através dele
+
+\q
+
+psql -U us_dnocs -d postgres
+
+create role gr_intranet WITH LOGIN;
+\q
+
+
+== Criação do banco de dados db_intranet pelo usuário us_dnocs e tornando o grupo gr_intranet seu dono;
+
+psql -U us_dnocs -d postgres
+create database db_intranet owner gr_intranet;
+
+\l
+
+
+== Acessar o db_intranet com gr_intranet
+
+psql -U gr_intranet -d db_intranet
+\q
+
+Este user pode criar qualquer objeto no banco db_intranet.
+
+
+== Remover o esquema public do db_intranet para evitar confusões e tornar o mesmo mais seguro.
+
+psql -U us_dnocs -d db_intranet
+drop schema public;
+
+
+== Criar um usuário chamado us_testes para gerenciar o esquema sc_testes e ser seu dono. Este usuário pertencerá ao grupo gr_intranet e será criado pelo usuário us_dnocs
+
+psql -U us_dnocs -d postgres
+
+create role us_testes in role gr_intranet login password 'zmxn1029T@';
+\du
+\q
+
+
+== Tornar o us_testes o dono do sc_testes
+
+psql -U us_dnocs -d db_intranet
+
+create schema sc_testes AUTHORIZATION us_testes;
+
+GRANT ALL ON SCHEMA sc_testes TO us_testes;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA sc_testes TO us_testes;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA sc_testes TO us_testes;
+
+Ficar atento, pois talvez seja necessário executar o último comando após importar o script.
+Caso ao executar algum comando do cake para cadastrar algo no banco e aparecer a mensagem de que o banco não tem nenhuma tabela execute os dois últimos comandos acima.
+
+
+== Acessar o sc_testes com us_testes
+
+psql -U us_testes -d db_intranet
+
+Tornar o schema sc_testes o default.
+
+Podemos criar objetos aqui mas especificando o esquema como prefixo. Ex:
+create table sc_testes.tabela1(campo1 int);
+
+SET search_path TO sc_testes;
+
+Agora podemos criar e excluir sem especificar o esquema, pois estamos nele:
+
+create testes.tabela1(campo1 int);
+
+
+== Liberando, como root, acesso para o servidor de arquivos, que está no IP 172.16.1.15
+
+\q
+exit
+nano /var/lib/pgsql/9.4/data/pg_hba.conf
+
+Precisamos ter uma linha assim:
+
+host    db_intranet     all             172.16.1.15/32          md5
+
+E reiniciar o postgresql
+
+service postgresql-9.4 restart
+
+
+Tornei meu usuário ribamar_sousa superuser para poder acessar todos os bancos do meu desktop.
+
+alter role ribamar_sousa superuser;
+
+

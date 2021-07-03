@@ -1,0 +1,25 @@
+
+
+unidade enum('KG', 'M', 'M3', 'G') DEFAULT 'KG' NOT NULL;
+
+O enum traz uma lista de possíveis valores e é interessante usar um tipo de campo select para listar os mesmos.
+
+DECIMAL(M,D)
+
+PRECO DECIMAL (12,2);
+
+DATETIME - Entre 1000-01-01 00:00:00 e 9999-12-31 23:59:59
+
+data datetime
+
+data '1973-12-30 15:30:00';
+
+YEAR - pode armazenar o ano com 2 ou 4 dígitos
+
+Entre 1970 e 2069
+
+YEAR(2) ou YEAR
+
+Valor default para time
+
+time timestamp DEFAULT NOW());

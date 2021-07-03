@@ -1,0 +1,57 @@
+Triggers com MySQL
+
+​O que é um Trigger SQL?
+Um trigger (“gatilho”) é um objeto programável do banco de dados associado a uma tabela. Trata-se de um procedimento que é invocado automaticamente quando um comando DML é executado na tabela, sendo executado para cada linha afetada. Desta forma, as operações que podem disparar um trigger são:
+    • INSERT 
+    • UPDATE 
+    • DELETE 
+
+Modos de Disparo de um Trigger
+Um Trigger em MySQL pode ser disparado de dois modos diferentes:
+    • BEFORE – O trigger é disparado e seu código executado ANTES da execução de cada evento – por exemplo, antes de cada inserção de registros na tabela. 
+    • AFTER – O código presente no trigger é executado após todas as ações terem sido completadas na tabela especificada. 
+
+Sintaxe
+
+CREATE TRIGGER nome before/after insert/update/delete
+ON tabela
+FOR EACH ROW
+declarações
+
+Convenção para nomes
+
+tg_compras_ai    (tg - trigger, compras - nome da tabela, ai - after insert
+
+Exemplo
+
+CREATE TRIGGER tr_produtos_bi BEFORE INSERT
+ON produtos
+FOR EACH ROW
+SET NEW.desconto = (NEW.preco * 0.90);
+
+Exibir triggers
+
+show triggers
+
+Excluir
+
+drop trigger nome
+
+Não se pode chamar diretamente um TRIGGER com CALL, como se faz com um Stored Procedures;
+
+​Os registros NEW e OLD
+
+Como os triggers, são executados em conjunto com operações de inclusão e exclusão, é necessário poder acessar os registros que estão sendo incluídos ou removidos. Isso pode ser feito através das palavras NEW e OLD.
+
+Em gatilhos executados após a inserção de registros, a palavra reservada NEW dá acesso ao novo registro. Pode-se acessar as colunas da tabela como atributo do registro NEW, como veremos nos exemplos.
+
+O operador OLD funciona de forma semelhante, porém em gatilhos que são executados com a exclusão de dados, o OLD dá acesso ao registro que está sendo removido.
+
+A trigger abaixo é interessante pois no evento UPDATE usa NEW e OLD:
+
+CREATE TRIGGER `tg_compras_au` AFTER UPDATE ON `compras`
+FOR EACH ROW
+      CALL sp_atualizaestoque (new.produto_id, new.quantidade - old.quantidade); -- quantidade nova - quantidade removida
+
+A palavra NEW dá acesso aos registros novos, adicionados. A OLD aos registros excluídos. Lembrando que um update é constituido internamente por um inserte e um delete, portando conta com NEW e OLD.
+

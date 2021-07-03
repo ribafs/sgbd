@@ -1,0 +1,33 @@
+A view is a preset query stored in a database. A view could be useful for improved security by restricting the data available to less-privilege users; or producing derived column (such as total prices from unit prices).
+
+Syntax:
+
+CREATE VIEW viewName (columnList) AS selectStatement
+
+Example: Our products table has 5 columns. We can create a view to restrict certain users to two columns, name and price, as follows:
+-- Create a VIEW which shows only selected columns
+DROP VIEW IF EXISTS products_view;
+
+CREATE VIEW products_view (Name, Price)
+AS
+SELECT CONCAT(productCode, ' - ', name), price FROM products;
+
+DESCRIBE products_view;
+   
+SELECT * FROM products_view;
+
+-- Create another VIEW with a derived column
+DROP VIEW IF EXISTS products_total_view;
+ 
+CREATE VIEW products_total_view
+AS
+SELECT
+   CONCAT(productCode, ' - ', name) AS Name,
+   quantity AS Quantity,
+   price AS Price,
+   quantity*price AS Total
+FROM products;
+ 
+SELECT * FROM products_total_view;
+
+

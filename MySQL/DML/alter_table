@@ -1,0 +1,9 @@
+ALTER TABLE products
+       ADD COLUMN supplierID INT UNSIGNED NOT NULL;
+
+ALTER TABLE products
+       ADD FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID);
+
+describe products;
+
+

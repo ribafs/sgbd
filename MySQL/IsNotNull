@@ -1,0 +1,132 @@
+
+MySQL Condition: Where IS NOT NULL With Examples
+June 19, 2019 By Admin Leave a Comment on MySQL Condition: Where IS NOT NULL With Examples
+
+In this MySQL tutorial point – you will learn how to use MySQL WHERE IS NOT NULL. In this tutorial, we will also learn about MySQL WHERE “IS NOT NULL” syntax and examples. We will describe important things about “IS NOT NULL” & also how you can use this with a different MySQL clauses & logical operators.
+
+Whenever we obtain data from a table of MYSQL database. To fetch data from the database table, we require the conditions in our MYSQL query in order of our requirement. As we have done in the query of MYSQL, AND, OR, NOT, etc. We can do this with IS NOT NULL to fetch data from the MySQL database table.
+
+In our previous tutorial – you have learned about logical operators like AND, OR, NOT. IF you want to know more about MySQL logical operators click here.
+Table Of Contents
+
+    Syntax
+    Params(Parameters)
+    Ex:-Using SELECT Clause With MySQL IS NOT NULL
+    Ex:-Using “INSERT INTO” Clause With MySQL IS NOT NULL
+    Ex:-UPDATE Clause With MySQL IS NOT NULL
+    Ex:-DELETE Clause With MySQL IS NOT NULL
+    Ex:-Using IS NOT NULL With AND Logical Operator
+    Ex:-Using IS NOT NULL With OR Logical Operator
+
+MySQL WHERE IS NOT NULL
+
+In order to manipulate data in MySQL database tables, we can use “IS NOT NULL” with MySQL clauses with examples. MySQL clauses like INSERT INTO, SELECT, UPDATE, DELETE etc. And Also we can use this with logical operator like (AND, OR) etc.
+Syntax
+
+MySQL syntax is “IS NOT NULL” given below : –
+
+table_column_name IS NOT NULL
+
+OR
+
+exp IS NOT NULL
+
+Params
+
+table_column_name(exp) :- It’s the table column name that you check the value if it is not NULL.
+
+When we use MySQL “IS NOT NULL” with any table column, then it will be true and false.
+
+    If the given condition is fulfilled, then it will come true.
+    If the given condition is not fulfilled, then it will come false.
+
+Using SELECT Clause With MySQL IS NOT NULL
+
+Now, We will describe how to use the MySQL SELECT Clause with IS NOT NULL.
+
+ SELECT *
+ FROM users
+ WHERE email_address IS NOT NULL;
+
+The above example query will fetch all records from database table users using MySQL IS NOT NULL & SELECT Clause. Where the email_address column does not contain a null value.
+Using “INSERT INTO” Clause MySQL “IS NOT NULL”
+
+Next, Example of “INSERT INTO” with “IS NOT NULL”, we will describe how to use the MySQL “INSERT INTO” Clause with IS NOT NULL.
+
+ INSERT INTO vendors (
+      name, 
+      phone, 
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+      postalCode,
+      country,
+      customer_id
+  )
+  SELECT 
+      name,
+      phone,
+      addressLine1,
+      addressLine2,
+      city,
+      state ,
+      postalCode,
+      country,
+      customer_id
+  FROM 
+      customers
+  WHERE 
+      country IS NOT NULL;
+
+For the above example of MySQL “IS NOT NULL” with “INSERT INTO” Clause will insert all records from database table vendors. Where the country column does not contain a null value.
+UPDATE Clause With MySQL “IS NOT NULL”
+
+Next example of “UPDATE” with “IS NOT NULL”, we will describe how to use the MySQL “UPDATE” Clause with IS NOT NULL.
+
+ UPDATE users
+ SET verified = 1
+ WHERE status IS NOT NULL;
+
+It above example query will update all records from database table users using MySQL IS NOT NULL & UPDATE Clause. Where the “status” column does not contain a null value.
+DELETE Clause With MySQL “IS NOT NULL”
+
+In the below example of “DELETE” with “IS NOT NULL”, we will describe how to use the MySQL “DELETE” Clause with IS NOT NULL.
+
+ DELETE FROM users
+ WHERE verified IS NOT NULL;
+
+The above query will delete all records from database table users using MySQL IS NOT NULL & DELETE Clause. Where the “verified” column does not contain a null value.
+Using IS NOT NULL On Join Conditions
+
+In below example, We will describe how to use the MySQL “LEFT JOIN” Clause with IS NOT NULL.
+
+ SELECT * FROM users 
+ LEFT JOIN posts ON post.user_id = users.id 
+ WHERE user_id IS NOT NULL;
+
+It will fetch records from database table users using MySQL IS NOT NULL & LEFT JOIN Clause. Where the “user_id” column does not contain a null value.
+Using IS NOT NULL With AND Logical Operator
+
+Example of “AND” logical operator with “IS NOT NULL”, we will describe how to use the MySQL “AND” operator with IS NOT NULL.
+
+ SELECT * FROM users 
+ WHERE email_address IS NOT NULL 
+ AND mobile_number IS NOT NULL;
+
+The above MySQL query get all the records from database table users using MySQL IS NOT NULL & AND logical operator. Where the “email_address” and “mobile_number” column does not contain a null value.
+Using IS NOT NULL With OR Logical Operator
+
+Example of “OR” logical operator with “IS NOT NULL”, we will describe how to use the MySQL “OR” operator with IS NOT NULL.
+
+ SELECT * FROM users 
+ WHERE email_address IS NOT NULL 
+ OR mobile_number IS NOT NULL;
+
+Where “both email address” and “mobile number” The value of one of the columns is also found. than the above query fetch all records from database table users by using IS NOT NULL with OR logical operator.
+Conclusion
+
+In this mysql tutorial point – we have learned how to use “IS NOT NULL” with MySQL basic clauses, join clause & logical operators with examples.
+
+https://www.tutsmake.com/mysql-where-is-not-null-with-examples/
+

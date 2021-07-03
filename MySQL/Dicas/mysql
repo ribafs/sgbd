@@ -1,0 +1,20 @@
+mysql -u root -p
+
+CREATE DATABASE familia CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE USER 'us_familia'@'localhost' IDENTIFIED BY 'senhaforte';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES, LOCK TABLES ON familia.* TO 'us_familia'@'localhost' IDENTIFIED BY 'yourpassword';
+FLUSH PRIVILEGES;
+\q
+
+Outros privilégios
+ALL PRIVILEGES- como vimos anteriormente, isso daria a um usuário do MySQL todo o acesso a uma determinada base de dados (ou se nenhuma base de dados for selecionada, todo o sistema)
+CREATE- permite criar novas tabelas ou bases de dados
+DROP- permite deletar tableas ou bases de dados
+DELETE- permite deletar linhas das tabelas
+INSERT- permite inserir linhas nas tabelas
+SELECT- permite utilizar o comando Select para ler bases de dados
+UPDATE- permite atualizar linhas das tabelas
+GRANT OPTION- permite conceder ou revogar privilégios de outros usuários 
+
+mysql -u root -p
+mysql> GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES, LOCK TABLES ON joomla.* TO 'yourusername'@'localhost' IDENTIFIED BY 'yourpassword';

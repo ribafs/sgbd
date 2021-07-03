@@ -1,0 +1,35 @@
+Usando a console do MySQL
+
+- acessando um banco
+- mostrando informações sobre o banco
+- mostrando informações sobre uma tabela
+- consultando os registros de uma tabela
+- inserindo registro em uma tabela
+- Outras operações
+- Importando um script sql para um banco
+- Exportando um banco para um sql
+
+Usando o Adminer para:
+- Abrir para trabalho no MySQL
+- Criar um banco de dados mudando a codificação
+- Importar um script .sql para o banco criado
+- Criar uma tabela no modo SQL
+- Outras operações no SQL
+- Criar uma tabela no modo gráfico
+- Alterar a estrutura de uma tabela
+- Alterar a estrutura de um banco de dados
+- Inserir registros no modo gráfico
+- Abrir para trabalho no PostgreSQL
+
+Usando o phpMyAdmin
+
+Usando o MySQL Workbench
+
+
+Mostrar as consultas básicas:
+
+- select
+- insert
+- update
+- delete
+

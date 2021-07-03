@@ -1,0 +1,44 @@
+Exportando Dados do MySQL para Excel com PHP
+    • 25/04/2019 - PHP - Erlânio Freire Barros - 51 Acessos 
+ 
+Criar relatórios em sistemas, nem sempre é algo tão trivial como parece, em alguns momentos podemos nos deparar com a necessidade de exportar os dados em um formato diferenciado. Por experiência própria, é de Lei que algum cliente irá pedir isto para você, pode esperar!
+
+Exportar dados de um programa para outro e muito comum ainda mais quando estamos trabalhando com dados que necessitam de análise, um dos programas mais usados para análise de dados é o Excel, por este motivo neste post vou mostrar como exportar os dados do MySQL para o Excel com o PHP.
+<?php
+ // Inclui a conexão
+ include_once('conexao.php');
+
+ // Nome do Arquivo do Excel que será gerado
+ $arquivo = 'dados_emails.xls';
+
+ // Criamos uma tabela HTML com o formato da planilha para excel
+ $tabela = '<table border="1">';
+ $tabela .= '<tr>';
+ $tabela .= '<td colspan="2">Tabela de E-mails</tr>';
+ $tabela .= '</tr>';
+ $tabela .= '<tr>';
+ $tabela .= '<td><b>Nome</b></td>';
+ $tabela .= '<td><b>Email</b></td>';
+ $tabela .= '</tr>';
+
+ // Puxando dados do Banco de dados
+ $resultado = mysql_query('SELECT * FROM emails');
+
+ while($dados = mysql_fetch_array($resultado))
+ {
+  $tabela .= '<tr>';
+  $tabela .= '<td>'.$dados['nome'].'</td>';
+  $tabela .= '<td>'.$dados['email'].'</td>';
+  $tabela .= '</tr>';
+ }
+
+ $tabela .= '</table>';
+
+ // Força o Download do Arquivo Gerado
+ header ('Cache-Control: no-cache, must-revalidate');
+ header ('Pragma: no-cache');
+ header('Content-Type: application/x-msexcel');
+ header ("Content-Disposition: attachment; filename=\"{$arquivo}\"");
+ echo $tabela;
+?>
+https://erlaniofreire.com.br/web/post/exportando-dados-do-mysql-para-excel-com-php/68 

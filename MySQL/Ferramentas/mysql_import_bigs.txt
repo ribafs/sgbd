@@ -1,0 +1,23 @@
+Como importar banco grande com MySQL
+
+
+O banco de dados deste site (Joomla com MySQL), no qual inseri várias imagens e que está com 46MB.
+
+Então ao importar seu script para restaurar localmente ele importava somente algumas tabelas e apresentava o erro
+Mysql Server has gone away
+
+Importei pela linha de comando (baixei o script, criei o banco):
+
+mysql -uroot -p ribafs < portal.sql
+
+Uma rápida busca encontrei a resposta neste site:
+https://piwik.org/faq/troubleshooting/faq_183/
+
+Apenas editei o arquivo abaixo:
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+
+Descomentar e aumentei o valor do parâmetro:
+max_allowed_packet     para 128
+
+sudo service mysql restart
+

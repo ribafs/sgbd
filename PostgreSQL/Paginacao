@@ -1,0 +1,11 @@
+SELECT * FROM products LIMIT 4 ;
+
+SELECT * FROM products ORDER BY category,cost LIMIT 6 OFFSET 5 ;
+
+if($sgbd == 'mysql'){
+    $results = $pdo->prepare("SELECT * FROM clientes ORDER BY id LIMIT $start, $row_limit");
+}elseif($sgbd == 'pgsql'){
+    $results = $pdo->prepare("SELECT * FROM clientes ORDER BY id LIMIT $row_limit OFFSET $start");    
+}
+
+

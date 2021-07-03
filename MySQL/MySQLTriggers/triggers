@@ -1,0 +1,61 @@
+A trigger is a event handler that executes in response to an event. A trigger is associated with a table. Three types of table events can activate a trigger: DELETE (include REPLACE), INSERT (include LOAD DATA and REPLACE), and UPDATE. You can set the trigger to execute BEFORE or AFTER the table event.
+Syntax:
+CREATE TRIGGER triggerName 
+  {AFTER|BEFORE} {DELETE|INSERT|UPDATE}
+ON tableName FOR EACH ROW 
+  statements
+You can refer to columns in the table associated with the trigger by using the aliases OLD and NEW:
+    • For DELETE and UPDATE: OLD.columnName refers to a column of an existing row before it is updated or deleted. 
+    • For INSERT and UPDATE: NEW.colunmName refers to the column of a new row to be inserted or an existing row after it is updated. To set a column value for INSERT, you need to use a BEFORE INSERT trigger and set the via via NEW.columnName. See example below. 
+Example: Save the row in a backup table before the row is deleted.
+-- Create the backup table for persons (See earlier example)
+CREATE TABLE backup_persons (
+   `personID`         INT UNSIGNED  NOT NULL,
+   `firstName`        VARCHAR(20)   NOT NULL,
+   `lastName`         VARCHAR(20)   NOT NULL,
+   `datetimeDeleted`  DATETIME      NOT NULL,
+    PRIMARY KEY(`personID`)
+);
+ 
+-- Define a trigger "before" a row is "deleted" from table persons
+DELIMITER //
+CREATE TRIGGER archiveEmployees
+BEFORE DELETE ON persons FOR EACH ROW
+BEGIN
+  INSERT INTO backup_persons
+  -- OLD is a system-provided alias referring to the existing columns
+  --  before update or delete.
+  VALUES (OLD.personID, OLD.firstName, OLD.lastName, NOW());
+END//
+
+DELIMITER ;
+To test the trigger:
+INSERT INTO persons VALUE (NULL, 'Peter', 'Johonson');
+   
+DELETE FROM persons WHERE firstName='Peter' AND lastName = 'Johonson';
+   
+SELECT * FROM persons WHERE firstName='Peter' AND lastName = 'Johonson';
+Empty set (0.00 sec)
+   
+SELECT * FROM backup_persons WHERE firstName='Peter' AND lastName = 'Johonson';
+
+Example (Created and Last-Updated)
+DROP TABLE timestamp_trigger_arena;
+CREATE TABLE timestamp_trigger_arena (
+   `desc`        VARCHAR(20),
+   created       TIMESTAMP DEFAULT 0,
+   last_updated  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+ 
+CREATE TRIGGER created_trigger
+BEFORE INSERT ON timestamp_trigger_arena FOR EACH ROW
+   SET NEW.created = NOW();
+   -- NEW is an alias referring to the columns to be inserted or updated.
+   -- Need to set NEW.columnName BEFORE insert.
+ 
+INSERT INTO timestamp_trigger_arena (`desc`) VALUE ('Created');
+SELECT * FROM timestamp_trigger_arena;
+UPDATE timestamp_trigger_arena SET `desc`='Updated' WHERE `desc`='Created';
+SELECT * FROM timestamp_trigger_arena;
+
+

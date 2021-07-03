@@ -1,0 +1,90 @@
+Stored Procedures - Prepared Statement
+
+A prepared statement (or parameterized statement) contains placeholders for input parameters. You can reuse the same prepared statement many times, with different inputs. Prepared statements are often pre-compiled, which are more efficient than the normal statements.
+The steps in using prepared statements are:
+    1. Allocate a prepared statement, with placeholders indicated as ?. 
+    2. Set the inputs. 
+    3. Execute the prepared statement with the inputs (for the placeholders). 
+    4. Repeat Step 2 and 3 for another execution. 
+    5. Deallocate the prepared statement. 
+
+PREPARE pstmt FROM 'SELECT * FROM products WHERE productCode = ? AND quantity <= ?';
+SET @productCode = 'PEC';                    -- Set variables
+SET @quantity = 200;
+EXECUTE pstmt USING @productCode, @quantity;
+    -- list the variables in the same order as the ?'s
+ 
+-- Another invocation with different inputs
+SET @quantity = 500;
+EXECUTE pstmt USING @productCode, @quantity;
+ 
+DEALLOCATE PREPARE pstmt;
+Example
+SET @query = 'INSERT INTO products VALUES (?, ?, ?, ?, ?)';
+PREPARE pstmt FROM @query;
+SET @productID = NULL;
+SET @productCode = 'PEC';
+SET @name = 'Pencil HB';
+SET @quantity = 500;
+SET @price = 0.49;
+EXECUTE pstmt USING @productID, @productCode, @name, @quantity, @price;  
+    -- list the variables in the same order as the ?'s
+DEALLOCATE PREPARE pstmt;
+
+-- Use this table for testing stored procedure
+CREATE TABLE IF NOT EXISTS products (
+   productID    INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+   productCode  CHAR(3)       NOT NULL DEFAULT '',
+   name         VARCHAR(30)   NOT NULL DEFAULT '',
+   quantity     INT UNSIGNED  NOT NULL DEFAULT 0,
+   price        DECIMAL(7,2)  NOT NULL DEFAULT 99999.99,
+   PRIMARY KEY  (productID)
+);
+ 
+INSERT INTO products VALUES 
+   (1001, 'PEN', 'Pen Red',    5000, 1.23),
+   (1002, 'PEN', 'Pen Blue',   8000, 1.25),
+   (1003, 'PEN', 'Pen Black',  2000, 1.25),
+   (1004, 'PEC', 'Pencil 2B', 10000, 0.48),
+   (1005, 'PEC', 'Pencil 2H',  8000, 0.49); 
+SELECT * FROM `products`;
+
+-- Define a simple procedure without parameter
+-- The procedure has only one statement
+CREATE PROCEDURE simpleProc()
+SELECT * FROM products;
+
+-- Use CALL to invoke the procedure
+CALL simpleProc;
+
+-- Define a procedure with a compound statement
+-- The compound statement uses ; which crash with MySQL delimiter.
+-- Hence, we change the MySQL delimiter temporary
+DELIMITER //
+CREATE PROCEDURE compoundProc()
+BEGIN  -- A compound statement is enclosed within BEGIN and END
+  SELECT * FROM products;
+  SELECT NOW();
+END//  -- End of MySQL CREATE PROCEDURE statement
+DELIMITER ;  -- Restore MySQL delimiter
+ 
+-- Invoke the procedure
+CALL compoundProc;
+
+-- Define stored procedure with parameters
+DELIMITER //
+
+-- Find the products with `quantity` less than the given `reorderLevel`,
+-- and return the total cost to replenish in `cost`
+-- The parameters could be declared as IN, OUT or INOUT
+CREATE PROCEDURE reorderCost (IN reorderLevel INT, OUT cost DECIMAL(8,2))
+BEGIN
+  SELECT IFNULL(sum(price*(reorderLevel-quantity)), 0) INTO cost
+  FROM products
+  WHERE quantity < reorderLevel;
+END//
+
+DELIMITER ;     -- restore the default delimiter ';'
+ 
+-- Call the stored procedure. Pass in input parameter, and receive output in a variable
+CALL reorderCost(5000, @cost);

@@ -1,0 +1,20 @@
+== Criar senha do postgres e liberar acesso no pg_hba apenas para uso local
+
+Como é apenas para acesso local não precisa mexer no postgresql.conf
+
+sudo su
+su - postgres
+psql
+alter role postgres password 'postgres';
+\q
+exit
+nano /etc/postgresql/12/main/pg_hba.conf
+
+Mudar 
+local   all             postgres                                peer
+
+Para
+local   all             postgres                                md5
+
+sudo service postgresql restart
+

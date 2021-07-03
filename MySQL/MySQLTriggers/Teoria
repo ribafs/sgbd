@@ -1,0 +1,748 @@
+Triggers são disparadas em eventos das tabelas associadas: insert, update e delete
+
+O MySQL somente suporta trigger do tipo row-level trigger é ativada para cada registro que é inserido, atualizado, ou apagado.  Por exemplo, se uma tabela tiver 100 registros inseridas, atualizadas ou apagadas, o gatilho é automaticamente invocado 100 vezes para os 100 registros afetados. Não suporta trigger statement-level trigger.
+
+Inserir e atualizar é new
+Excluir é old
+
+Trigger Event   OLD NEW
+
+INSERT          No  Yes
+UPDATE          Yes Yes
+DELETE          Yes No
+
+CREATE TRIGGER trigger_name
+{BEFORE | AFTER} {INSERT | UPDATE| DELETE }
+ON table_name FOR EACH ROW
+trigger_body;
+
+A trigger do tipo BEFORE INSERT é automaticamente disparada a cada evento de inserção de registro na tabela.
+
+AFTER INSERT é o evento disparado automaticamente após a inserção de cada registro em uma tabela.
+
+Mostrando triggers
+
+SHOW TRIGGERS
+
+SHOW TRIGGERS
+[{FROM | IN} database_name]
+[LIKE 'pattern' | WHERE search_condition];
+Code language: SQL (Structured Query Language) (sql)
+
+SHOW TRIGGERS 
+FROM database_name;
+
+
+Stored procedures e
+Stored funções
+
+Stored procedures são procedimentos que armazenam consultas SQL. São consultas salvas.
+
+Por definição, um procedimento armazenado/stored procedure é um segmento de instruções SQL declarativas armazenadas dentro do MySQL Server. 
+
+Depois que salvamos a stored procedure dando um nome para ela podemos chamá-la a qualquer momento, usando instrução CALL.
+
+Exemplo
+
+Consulta SQL
+
+select * from estoques;
+
+Stored procedure
+
+DELIMITER $$
+
+CREATE PROCEDURE GetEstoques()
+BEGIN
+        SELECT * FROM estoques;    
+END$$
+DELIMITER ;
+
+Chamando
+
+CALL GetEstoques();
+
+Terá o mesmo retorno que a consulta SQL.
+
+A primeira vez que se invoca um procedimento armazenado, o MySQL procura o nome no catálogo da base de dados, compila o código do procedimento armazenado, coloca-o numa área de memória conhecida como cache, e executa o procedimento armazenado.
+
+Se invocar novamente o mesmo procedimento armazenado na mesma sessão, o MySQL apenas executa o procedimento armazenado a partir do cache sem ter de o recompilar.
+
+Vantagens das stored procedures
+
+- Reduz o tráfego na rede
+- Centraliza regras de negócio no banco
+- Torna o banco de dados mais seguro
+
+Desvantagens:
+
+- Caso use muitas stored procedures aumentará o consumo de memória
+- Dificil de debugar
+- Mais trabalhoso de manter
+
+Delimitador
+
+Para iniciar uma stored procedure e para finalizar usamos o comando DELIMITER.
+
+DELIMITER delimiter_character
+
+DELIMITER //
+
+ou
+
+DELIMITER $$
+
+Exemplo
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_name()
+BEGIN
+  -- statements
+END $$
+
+DELIMITER ;
+
+ou
+
+DELIMITER //
+
+CREATE PROCEDURE GetAllProducts()
+BEGIN
+        SELECT *  FROM products;
+END //
+
+DELIMITER ;
+
+Variáveis
+
+DECLARE variable_name datatype(size) [DEFAULT default_value];
+
+DECLARE totalSale DEC(10,2) DEFAULT 0.0;
+
+DECLARE x, y INT DEFAULT 0;
+
+DECLARE total INT DEFAULT 0;
+SET total = 10;
+
+DECLARE productCount INT DEFAULT 0;
+
+SELECT COUNT(*) 
+INTO productCount
+FROM products;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetTotalOrder()
+BEGIN
+        DECLARE totalOrder INT DEFAULT 0;
+    
+    SELECT COUNT(*) 
+    INTO totalOrder
+    FROM orders;
+    
+    SELECT totalOrder;
+END$$
+
+DELIMITER ;
+
+Parâmetros (IN/OUT/INOUT)
+
+DELIMITER //
+
+CREATE PROCEDURE GetOfficeByCountry(
+        IN countryName VARCHAR(255)
+)
+BEGIN
+        SELECT * 
+        FROM offices
+        WHERE country = countryName;
+END //
+
+DELIMITER ;
+
+CALL GetOfficeByCountry('USA');
+
+DELIMITER $$
+
+CREATE PROCEDURE GetOrderCountByStatus (
+        IN  orderStatus VARCHAR(25),
+        OUT total INT
+)
+BEGIN
+        SELECT COUNT(orderNumber)
+        INTO total
+        FROM orders
+        WHERE status = orderStatus;
+END$$
+
+DELIMITER ;
+
+CALL GetOrderCountByStatus('in process',@total);
+SELECT @total AS  total_in_process;
+
+DELIMITER $$
+
+CREATE PROCEDURE SetCounter(
+        INOUT counter INT,
+    IN inc INT
+)
+BEGIN
+        SET counter = counter + inc;
+END$$
+
+DELIMITER ;
+
+SET @counter = 1;
+CALL SetCounter(@counter,1); -- 2
+CALL SetCounter(@counter,1); -- 3
+CALL SetCounter(@counter,5); -- 8
+SELECT @counter; -- 8
+
+SHOW PROCEDURE STATUS;
+
+SHOW PROCEDURE STATUS [LIKE 'pattern' | WHERE search_condition]
+
+SHOW PROCEDURE STATUS WHERE db = 'classicmodels';
+
+SHOW PROCEDURE STATUS LIKE '%pattern%'
+
+SELECT 
+    routine_name
+FROM
+    information_schema.routines
+WHERE
+    routine_type = 'PROCEDURE'
+        AND routine_schema = '<database_name>';
+
+IF condition THEN 
+   statements;
+END IF;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetCustomerLevel(
+    IN  pCustomerNumber INT, 
+    OUT pCustomerLevel  VARCHAR(20))
+BEGIN
+    DECLARE credit DECIMAL(10,2) DEFAULT 0;
+
+    SELECT creditLimit 
+    INTO credit
+    FROM customers
+    WHERE customerNumber = pCustomerNumber;
+
+    IF credit > 50000 THEN
+        SET pCustomerLevel = 'PLATINUM';
+    END IF;
+END$$
+
+DELIMITER ;
+
+CALL GetCustomerLevel(141, @level);
+SELECT @level;
+
+IF condition THEN
+   statements;
+ELSE
+   else-statements;
+END IF;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetCustomerLevel(
+    IN  pCustomerNumber INT, 
+    OUT pCustomerLevel  VARCHAR(20))
+BEGIN
+    DECLARE credit DECIMAL DEFAULT 0;
+
+    SELECT creditLimit 
+    INTO credit
+    FROM customers
+    WHERE customerNumber = pCustomerNumber;
+
+    IF credit > 50000 THEN
+        SET pCustomerLevel = 'PLATINUM';
+    ELSE
+        SET pCustomerLevel = 'NOT PLATINUM';
+    END IF;
+END$$
+
+DELIMITER ;
+
+CALL GetCustomerLevel(447, @level);
+SELECT @level;
+
+IF condition THEN
+   statements;
+ELSEIF elseif-condition THEN
+   elseif-statements;
+...
+ELSE
+   else-statements;
+END IF;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetCustomerLevel(
+    IN  pCustomerNumber INT, 
+    OUT pCustomerLevel  VARCHAR(20))
+BEGIN
+    DECLARE credit DECIMAL DEFAULT 0;
+
+    SELECT creditLimit 
+    INTO credit
+    FROM customers
+    WHERE customerNumber = pCustomerNumber;
+
+    IF credit > 50000 THEN
+        SET pCustomerLevel = 'PLATINUM';
+    ELSEIF credit <= 50000 AND credit > 10000 THEN
+        SET pCustomerLevel = 'GOLD';
+    ELSE
+        SET pCustomerLevel = 'SILVER';
+    END IF;
+END $$
+
+DELIMITER ;
+
+CALL GetCustomerLevel(447, @level); 
+SELECT @level;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetCustomerShipping(
+        IN  pCustomerNUmber INT, 
+        OUT pShipping       VARCHAR(50)
+)
+BEGIN
+    DECLARE customerCountry VARCHAR(100);
+
+SELECT 
+    country
+INTO customerCountry FROM
+    customers
+WHERE
+    customerNumber = pCustomerNUmber;
+
+    CASE customerCountry
+                WHEN  'USA' THEN
+                   SET pShipping = '2-day Shipping';
+                WHEN 'Canada' THEN
+                   SET pShipping = '3-day Shipping';
+                ELSE
+                   SET pShipping = '5-day Shipping';
+        END CASE;
+END$$
+
+DELIMITER ;
+
+CALL GetCustomerShipping(112,@shipping);
+
+DELIMITER $$
+
+CREATE PROCEDURE GetDeliveryStatus(
+        IN pOrderNumber INT,
+    OUT pDeliveryStatus VARCHAR(100)
+)
+BEGIN
+        DECLARE waitingDay INT DEFAULT 0;
+    SELECT 
+                DATEDIFF(requiredDate, shippedDate)
+        INTO waitingDay
+        FROM orders
+    WHERE orderNumber = pOrderNumber;
+    
+    CASE 
+                WHEN waitingDay = 0 THEN 
+                        SET pDeliveryStatus = 'On Time';
+        WHEN waitingDay >= 1 AND waitingDay < 5 THEN
+                        SET pDeliveryStatus = 'Late';
+                WHEN waitingDay >= 5 THEN
+                        SET pDeliveryStatus = 'Very Late';
+                ELSE
+                        SET pDeliveryStatus = 'No Information';
+        END CASE;       
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE LoopDemo()
+BEGIN
+        DECLARE x  INT;
+        DECLARE str  VARCHAR(255);
+        
+        SET x = 1;
+        SET str =  '';
+        
+        loop_label:  LOOP
+                IF  x > 10 THEN 
+                        LEAVE  loop_label;
+                END  IF;
+            
+                SET  x = x + 1;
+                IF  (x mod 2) THEN
+                        ITERATE  loop_label;
+                ELSE
+                        SET  str = CONCAT(str,x,',');
+                END  IF;
+        END LOOP;
+        SELECT str;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE InsertCalendar(dt DATE)
+BEGIN
+    INSERT INTO calendars(
+        fulldate,
+        day,
+        month,
+        quarter,
+        year
+    )
+    VALUES(
+        dt, 
+        EXTRACT(DAY FROM dt),
+        EXTRACT(MONTH FROM dt),
+        EXTRACT(QUARTER FROM dt),
+        EXTRACT(YEAR FROM dt)
+    );
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE LoadCalendars(
+    startDate DATE, 
+    day INT
+)
+BEGIN
+    
+    DECLARE counter INT DEFAULT 1;
+    DECLARE dt DATE DEFAULT startDate;
+
+    WHILE counter <= day DO
+        CALL InsertCalendar(dt);
+        SET counter = counter + 1;
+        SET dt = DATE_ADD(dt,INTERVAL 1 day);
+    END WHILE;
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE RepeatDemo()
+BEGIN
+    DECLARE counter INT DEFAULT 1;
+    DECLARE result VARCHAR(100) DEFAULT '';
+    
+    REPEAT
+        SET result = CONCAT(result,counter,',');
+        SET counter = counter + 1;
+    UNTIL counter >= 10
+    END REPEAT;
+    
+    -- display result
+    SELECT result;
+END$$
+
+DELIMITER ;
+
+CALL RepeatDemo();
+
+CREATE PROCEDURE sp_name()
+sp: BEGIN
+    IF condition THEN
+        LEAVE sp;
+    END IF;
+    -- other statement
+END$$
+
+DELIMITER $$
+
+CREATE PROCEDURE CheckCredit(
+    inCustomerNumber int
+)
+sp: BEGIN
+    
+    DECLARE customerCount INT;
+
+    -- check if the customer exists
+    SELECT 
+        COUNT(*)
+    INTO customerCount 
+    FROM
+        customers
+    WHERE
+        customerNumber = inCustomerNumber;
+    
+    -- if the customer does not exist, terminate
+    -- the stored procedure
+    IF customerCount = 0 THEN
+        LEAVE sp;
+    END IF;
+    
+    -- other logic
+    -- ...
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE LeaveDemo(OUT result VARCHAR(100))
+BEGIN
+    DECLARE counter INT DEFAULT 1;
+    DECLARE times INT;
+    -- generate a random integer between 4 and 10
+    SET times  = FLOOR(RAND()*(10-4+1)+4);
+    SET result = '';
+    disp: LOOP
+        -- concatenate counters into the result
+        SET result = concat(result,counter,',');
+        
+        -- exit the loop if counter equals times
+        IF counter = times THEN
+            LEAVE disp; 
+        END IF;
+        SET counter = counter + 1;
+    END LOOP;
+END$$
+
+DELIMITER ;
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    ROLLBACK;
+    SELECT 'An error has occurred, operation rollbacked and the stored procedure was terminated';
+END;
+
+CREATE PROCEDURE InsertSupplierProduct(
+    IN inSupplierId INT, 
+    IN inProductId INT
+)
+BEGIN
+    -- exit if the duplicate key occurs
+    DECLARE EXIT HANDLER FOR 1062
+    BEGIN
+        SELECT CONCAT('Duplicate key (',inSupplierId,',',inProductId,') occurred') AS message;
+    END;
+    
+    -- insert a new row into the SupplierProducts
+    INSERT INTO SupplierProducts(supplierId,productId)
+    VALUES(inSupplierId,inProductId);
+    
+    -- return the products supplied by the supplier id
+    SELECT COUNT(*) 
+    FROM SupplierProducts
+    WHERE supplierId = inSupplierId;
+    
+END$$
+
+DELIMITER ;
+
+DECLARE EXIT HANDLER FOR 1062
+BEGIN
+    SELECT CONCAT('Duplicate key (',supplierId,',',productId,') occurred') AS message;
+END;
+
+CALL InsertSupplierProduct(1,1);
+CALL InsertSupplierProduct(1,2);
+CALL InsertSupplierProduct(1,3);
+
+DELIMITER $$
+
+CREATE PROCEDURE InsertSupplierProduct(
+    IN inSupplierId INT, 
+    IN inProductId INT
+)
+BEGIN
+    -- exit if the duplicate key occurs
+    DECLARE CONTINUE HANDLER FOR 1062
+    BEGIN
+        SELECT CONCAT('Duplicate key (',inSupplierId,',',inProductId,') occurred') AS message;
+    END;
+    
+    -- insert a new row into the SupplierProducts
+    INSERT INTO SupplierProducts(supplierId,productId)
+    VALUES(inSupplierId,inProductId);
+    
+    -- return the products supplied by the supplier id
+    SELECT COUNT(*) 
+    FROM SupplierProducts
+    WHERE supplierId = inSupplierId;
+    
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE InsertSupplierProduct(
+    IN inSupplierId INT, 
+    IN inProductId INT
+)
+BEGIN
+    -- exit if the duplicate key occurs
+    DECLARE EXIT HANDLER FOR 1062 SELECT 'Duplicate keys error encountered' Message; 
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION SELECT 'SQLException encountered' Message; 
+    DECLARE EXIT HANDLER FOR SQLSTATE '23000' SELECT 'SQLSTATE 23000' ErrorCode;
+    
+    -- insert a new row into the SupplierProducts
+    INSERT INTO SupplierProducts(supplierId,productId)
+    VALUES(inSupplierId,inProductId);
+    
+    -- return the products supplied by the supplier id
+    SELECT COUNT(*) 
+    FROM SupplierProducts
+    WHERE supplierId = inSupplierId;
+    
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE TestProc()
+BEGIN
+
+    DECLARE EXIT HANDLER FOR 1146 
+    SELECT 'Please create table abc first' Message; 
+        
+    SELECT * FROM abc;
+END$$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS TestProc;
+
+DELIMITER $$
+
+CREATE PROCEDURE TestProc()
+BEGIN
+    DECLARE TableNotFound CONDITION for 1146 ; 
+
+    DECLARE EXIT HANDLER FOR TableNotFound 
+        SELECT 'Please create table abc first' Message; 
+    SELECT * FROM abc;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE AddOrderItem(
+                         in orderNo int,
+                         in productCode varchar(45),
+                         in qty int, 
+                         in price double, 
+                         in lineNo int )
+BEGIN
+        DECLARE C INT;
+
+        SELECT COUNT(orderNumber) INTO C
+        FROM orders 
+        WHERE orderNumber = orderNo;
+
+        -- check if orderNumber exists
+        IF(C != 1) THEN 
+                SIGNAL SQLSTATE '45000'
+                        SET MESSAGE_TEXT = 'Order No not found in orders table';
+        END IF;
+        -- more code below
+        -- ...
+END
+
+DELIMITER $$
+
+CREATE PROCEDURE Divide(IN numerator INT, IN denominator INT, OUT result double)
+BEGIN
+        DECLARE division_by_zero CONDITION FOR SQLSTATE '22012';
+
+        DECLARE CONTINUE HANDLER FOR division_by_zero 
+        RESIGNAL SET MESSAGE_TEXT = 'Division by zero / Denominator cannot be zero';
+        -- 
+        IF denominator = 0 THEN
+                SIGNAL division_by_zero;
+        ELSE
+                SET result := numerator / denominator;
+        END IF;
+END
+
+CALL Divide(10,0,@result);
+
+Funções armazenadas
+
+DELIMITER $$
+
+CREATE FUNCTION function_name(
+    param1,
+    param2,…
+)
+RETURNS datatype
+[NOT] DETERMINISTIC
+BEGIN
+ -- statements
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE FUNCTION CustomerLevel(
+        credit DECIMAL(10,2)
+) 
+RETURNS VARCHAR(20)
+DETERMINISTIC
+BEGIN
+    DECLARE customerLevel VARCHAR(20);
+
+    IF credit > 50000 THEN
+                SET customerLevel = 'PLATINUM';
+    ELSEIF (credit >= 50000 AND 
+                        credit <= 10000) THEN
+        SET customerLevel = 'GOLD';
+    ELSEIF credit < 10000 THEN
+        SET customerLevel = 'SILVER';
+    END IF;
+        -- return the customer level
+        RETURN (customerLevel);
+END$$
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetCustomerLevel(
+    IN  customerNo INT,  
+    OUT customerLevel VARCHAR(20)
+)
+BEGIN
+
+        DECLARE credit DEC(10,2) DEFAULT 0;
+    
+    -- get credit limit of a customer
+    SELECT 
+                creditLimit 
+        INTO credit
+    FROM customers
+    WHERE 
+                customerNumber = customerNo;
+    
+    -- call the function 
+    SET customerLevel = CustomerLevel(credit);
+END$$
+
+DELIMITER ;
+
+SHOW FUNCTION STATUS;
+
+SHOW FUNCTION STATUS 
+[LIKE 'pattern' | WHERE search_condition];
+
+

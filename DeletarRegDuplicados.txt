@@ -1,0 +1,13 @@
+Como Localizar e Deletar registros duplicados 
+
+1.Select para localizar duplicados
+    select campo,campo1,count(*)
+     from tabela having count(*) > 1
+    group by campo,campo1
+
+2.Como deletar duplicados
+   delete from tab p1
+   where rowid < (select max(rowid)
+                    from tab1 p2
+                   where p1.primary_key = p2.primary_key);
+

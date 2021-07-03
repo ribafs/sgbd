@@ -1,0 +1,7 @@
+direto no banco de dados: 
+crie 2 colunas, 
+
+created_at do tipo TIMESTAMP com valor padrao CURRENT_TIMESTAMP
+updated_at do tipo TIMESTAMP com valor padrão CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+

@@ -1,0 +1,22 @@
+Declaration of Enumerated Types
+
+    Create enum type
+
+Create type name_of_enum_type (value_of_enum_type1, value_of_enum_type2, value_of_enum_type3, …, value_of_enum_typeN);
+
+    Create table using enum type
+
+create table name_of_table (name_of_column1 data_type, name_of_column2 enum_type, name_of_column3 data_type, …, name_of_columnN data_type);
+
+CREATE TYPE enum AS ENUM ('KG', 'UN', 'L');
+
+CREATE TABLE produtos (
+    descricao varchar(50),
+    unidade enum
+);
+INSERT INTO produtos VALUES ('Mamão', 'KG');
+SELECT * FROM produtos WHERE enum = 'KG';
+ descricao | unidade 
+-----------+--------------
+ Mamão     | KG
+

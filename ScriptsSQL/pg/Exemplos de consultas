@@ -1,0 +1,6 @@
+Exemplos de consultas:
+
+Mostrar com quem não entro em contato há mais de 30 dias
+SELECT pk_id_pessoa, nome_razao_social, folowup_ultimo FROM `pessoa` WHERE folowup_ultimo < DATE_ADD(NOW(), INTERVAL -30 day)
+
+

@@ -1,0 +1,11 @@
+- Criação do banco
+mysqladmin -u root -p create $DBNAME
+
+- Username do banco
+
+mysql -u$USERNAME -pPASSWORD -e "create database $DATABASE; GRANT ALL PRIVILEGES ON $DATABASE.* TO $USERNAME@localhost IDENTIFIED BY '$PASSWORD'"
+cat filename.sql | mysql -u username -p # type mysql password when asked for it
+
+Where filename.sql holds all the sql to create your database. Or...
+
+echo "create database `database-name`" | mysql -u username -p

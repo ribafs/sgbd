@@ -1,0 +1,34 @@
+== Criação de um usuário restrito 
+
+mysql_secure_installation
+
+A maior restrição é conceder somente o privilégio de SELECT
+
+mysql -uroot -p
+
+CREATE USER 'laravel_us'@'localhost' IDENTIFIED BY 'senhaforte';
+CREATE DATABASE `laravel_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON `laravel_db`.* TO `laravel_us`@localhost IDENTIFIED BY 'senhaforte';
+FLUSH PRIVILEGES;
+
+CREATE USER 'admin_us'@'localhost' IDENTIFIED BY 'senhaforte';
+CREATE DATABASE `admin_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON `admin_db`.* TO `admin_us`@localhost IDENTIFIED BY 'senhaforte';
+FLUSH PRIVILEGES;
+
+Após instalar use somente SELECT ou mais alguns privilégios
+
+REVOKE ALL ON `laravel_db`.* TO `laravel_us`@localhost IDENTIFIED BY 'senhaforte';
+GRANT SELECT ON `laravel_db`.* TO `laravel_us`@localhost IDENTIFIED BY 'senhaforte';
+FLUSH PRIVILEGES;
+
+GRANT INSERT, SELECT, DELETE, UPDATE ON `admin_db`.* TO `admin_us`@localhost IDENTIFIED BY 'zmxn1029A@';
+
+REVOKE ALL ON `admin_db`.* TO `admin_us`@localhost IDENTIFIED BY 'senhaforte';
+GRANT SELECT ON `admin_db`.* TO `admin_us`@localhost IDENTIFIED BY 'senhaforte';
+FLUSH PRIVILEGES;
+
+Os privilégios abaixo são suficientes para o CMS Joomla
+
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES, GRANT ON `ribafs_db`.* TO `ribafs_us`@localhost IDENTIFIED BY 'senhaforte';
+

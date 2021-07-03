@@ -1,0 +1,6 @@
+mysql -uroot -p
+create database portal;
+CREATE USER 'portal'@'localhost' IDENTIFIED BY 'user_password';
+GRANT ALTER CREATE CREATE TEMPORARY TABLES DELETE DROP INDEX INSERT LOCK TABLES SELECT UPDATE ON portal.* TO portal@localhost IDENTIFIED BY 'senhaforte' WITH GRANT OPTION; 
+
+

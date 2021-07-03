@@ -1,0 +1,18 @@
+mysqladmin:
+
+A sintaxe do comando e simples:
+
+ mysqladmin -u USER -p password NEWPASSWORD
+
+vamos então alterar o password do usuário ‘marcelo’ para ‘123’
+
+mysqladmin -u marcelo -p password '123'
+
+existem 3 inconvenientes de utilizar este comando para alterar o usuário:
+
+. você poderá somente alterar seu próprio usuário
+
+. você precisa de SUPER PRIVILEGIOS para executar este comando
+
+. caso você compartilhe a conta de usuário com outros users, você logara este comando no histórico, para isso podemos editar o ~/.bash_history e deletar as linhas onde o password e exibido.
+

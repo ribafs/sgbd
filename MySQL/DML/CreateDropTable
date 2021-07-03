@@ -1,0 +1,26 @@
+CREATE TABLE IF NOT EXISTS clientes (id int auto_increment primary key, nome varchar(255));
+
+CREATE temporary TABLE clientes (id int auto_increment primary key, name varchar(255);
+
+DROP TABLE IF EXISTS clientes;
+
+Valor default para data
+
+data date default(CURRENT_DATE),
+
+data DATE NOT NULL DEFAULT (DATE(CURRENT_TIMESTAMP))
+
+creation_time DATETIME DEFAULT CURRENT_TIMESTAMP
+
+`creation_time`     DATE DEFAULT (DATE_FORMAT(NOW(), '%Y-%m-%d'))
+
+
+
+As noted in this question Invalid default value for 'create_date' timestamp field, this error may happen when MySQL is in strict mode (which is default behavior, I believe).
+
+If you want to override it, just disable all these checks when creating your table:
+
+SET SQL_MODE='ALLOW_INVALID_DATES';
+
+The warning will be still generated, however it will allow to create the table.
+

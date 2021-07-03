@@ -1,0 +1,53 @@
+An event is a set of stored SQL statements that get executed at the scheduled date and time. Once an event is completed, it will be dropped automatically.
+
+Syntax:
+CREATE EVENT eventName ON SCHEDULE 
+AT timestamp [+ INTERVAL intervalNumber intervalUnit]
+DO 
+statements
+
+The schedule is defined in "AT timestamp" (e.g., AT now(), AT '2011-01-01 00:00:00'). You could specify a relative time with the optional "+ INTERVAL", (e.g., AT now() + 1 HOUR).
+You need to enable the event scheduler, which is a special thread for maintaining the event queue and running scheduled events:
+-- Enable Event Scheduler thread
+mysql> SET @@global.event_scheduler = ON;
+   
+-- Show the current processing threads
+mysql> SHOW PROCESSLIST \G
+
+You can also start the server mysqld with option --event-scheduler=DISABLED|ENABLED.
+Example:
+mysql> SELECT * FROM products WHERE productCode LIKE 'PIL%';
+
+-- Check whether event scheduler is enabled
+mysql> SELECT @@global.event_scheduler;
+
+-- Enable event scheduler
+mysql> SET @@global.event_scheduler = ON;
+-- In mysqld console --
+100426 21:58:20 [Note] Event Scheduler: scheduler thread started with id 2
+   
+-- Schedule an event to increase the price by 10% for some products
+mysql> CREATE EVENT testEvent
+   ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 30 SECOND
+   DO
+      UPDATE products SET unitPrice = unitPrice * 1.1 WHERE productCode LIKE 'PIL%';
+
+mysql> SHOW EVENTS \G
+
+SHOW EVENTS \G
+
+An event can also be recurring:
+CREATE EVENT eventName ON SCHEDULE 
+EVERY intervalNumber intervalUnit
+   [STARTS startTimestamp [+ INTERVAL count interval]]
+   [ENDS endTimestamp [+ INTERVAL count interval]]
+DO SQLstatements
+Example:
+-- Write an event to backup the Customers table daily
+CREATE EVENT backupCustomers
+ON SCHEDULE 
+EVERY 1 DAY
+STARTS NOW()
+ON COMPLETION PRESERVE
+COMMENT 'Daily copy of customers table to backup_customers'
+DO 

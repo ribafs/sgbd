@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <title>MySQL Backup</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/custom.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+    <div class="container">    
+            <div class="row">            
+	                <div class="col-lg-5 col-lg-offset-3">
+                    <h1 align="center">Backup de bancos MySQL</a></h1>
+                    <form id="backup-for-all-form" method="post" action="./backup-db.php" role="form">
+                        <div class="messages"></div>
+                        <div class="controls">
+                        
+                            <div class="row" align="center">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="form_name">Servidor</label>
+                                        <input id="dbhost" type="text" class="form-control" name="dbhost" value="localhost" required="required">                                        
+                                        <div class="help-block with-errors"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" align="center">                                
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="form_lastname">User</label>
+                                        <input id="dbuser" type="text" name="dbuser" class="form-control" value="root" required="required">
+                                        <div class="help-block with-errors"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" align="center">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="form_email">Senha</label>
+                                        <input id="dbpass" type="password" name="dbpass" class="form-control" value="">
+                                        <div class="help-block with-errors"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" align="center">                                
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="form_phone">Banco</label>
+                                        <input id="database" type="text" name="database" class="form-control" placeholder="Enter database name" required="required">
+                                        <div class="help-block with-errors"></div>
+                                    </div>
+                                </div>
+                            </div>                            
+                            <div class="row" align="center">
+                                <div class="col-md-12">
+                                    <input type="submit" class="btn btn-success btn-send" name="send" value="Send">
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div><!-- /.8 -->
+            </div> <!-- /.row-->
+        </div> <!-- /.container-->
+    </body>
+</html>

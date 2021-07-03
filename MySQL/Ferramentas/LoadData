@@ -1,0 +1,19 @@
+LOAD DATA INFILE 'd:/path/loaddata_arena.txt' INTO TABLE `backup_arena`
+  COLUMNS TERMINATED BY ',' 
+  LINES TERMINATED BY '\r\n'
+  IGNORE 1 LINES
+  (name, @dummy, @oldPrice, @dummy)
+  SET price = @oldPrice*1.1;
+
+(For Windows)
+-- Need to use forward-slash (instead of back-slash) as directory separator
+mysql> LOAD DATA LOCAL INFILE 'd:/myProject/products_in.csv' INTO TABLE products
+         COLUMNS TERMINATED BY ','
+         LINES TERMINATED BY '\r\n';
+ 
+(For Macs)
+mysql> LOAD DATA LOCAL INFILE '~/Documents/products_in.csv' INTO TABLE products
+         COLUMNS TERMINATED BY ',';
+mysql> SELECT * FROM products;
+
+

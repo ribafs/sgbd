@@ -1,0 +1,60 @@
+6 motivos para usar o PostgreSQL em vez do MySQL
+Muitos alunos do meu curso me perguntam porque eu recomendo o PostgreSQL em vez do MySQL.
+
+O PostgreSQL vem se provando cada vez mais uma solução melhor (não sou apenas eu quem está dizendo, boa parte da comunidade de desenvolvedores concorda com isso). Mas eu gostaria de listar aqui alguns dos motivos pelos quais eu particularmente prefiro ele.
+
+1) Transações a nível de tabela
+Transações são extremamente úteis para uma série de tarefas, como por exemplo executar queries perigosas (apagando registros por exemplo) diretamente no console do SGBD.
+
+Ao programar um software, uma boa hora de usar transações é ao migrar o schema do seu banco, ou seja, criar, modificar, apagar tabelas, colunas, índices, etc.
+
+O MySQL no entanto não oferece transações a nível de tabela. Por exemplo:
+
+BEGIN;
+CREATE TABLE `users` (`name` varchar(255));
+ROLLBACK;
+Ao rodar as queries acima, seria esperado que a tabela users fosse criada e então apagada, no entanto ela permanece.
+
+Execute o comando SHOW TABLES; para verificar.
+
+Já no PostgreSQL:
+
+BEGIN;
+CREATE TABLE "users" ("name" character varying);
+ROLLBACK;
+Tudo funciona conforme o esperado e a tabela users é completamente removida.
+
+Execute o comando \d para verificar.
+
+2) Funcionalidades
+Full-text search - O suporte à busca full-text do PostgreSQL não é só melhor que a que a do MySQL como foi incluida muito tempo antes.
+UUID - Geração nativa de campos UUID é uma funcionalidade (até o momento) exclusiva do PostgreSQL, a qual pode inclusive ser usada como chave-primária. Mais informações na documentação oficial.
+3) Enconding padrão
+O tipo de codificação padrão do PostgreSQL é o UTF-8. Simples assim!
+
+Já o padrão do MySQL é latin1, o qual simplesmente não é preparado para funcionar em qualquer canto do mundo (enquanto que o UTF-8 é). Além disso, você pode ter tabelas com diferentes encodings, o que na minha opinião é um tanto confuso.
+
+4) Tipos de dados (colunas)
+A maioria dos tipos de colunas são mais amigáveis e consistentes no PostgreSQL que no MySQL. Exemplo: um dado booleano é guardado como boolean no PostgreSQL e - por falta de algo mais apropriado - guardado como tinyint(1) no MySQL.
+
+O tipo tinyint, a princípio, guarda um valor inteiro de 1 dígito. Para guardar um boleano nesse tipo de campo, usamos 1 ou 0, o que é popularmente conhecido como “gambiarra” :)
+
+Outros exemplos bacanas de tipos do PostgreSQL são:
+jsonb - no qual você guarda dados em formato JSON de forma bastante flexível, com direito à indices GIN e tudo mais. Quem usava um banco de dados NoSQL só para ter dados sem schema definido, pode usar esse tipo de dado para potencialmente resolver esse problema.
+array - permite definir arrays multidimensionais de tamanhos variáveis.
+Além de enumerations, tipos geométricos, endereços de rede e vários outros.
+5) Comunidade e licenças
+Depois que o MySQL foi comprado pela Oracle, foi criado um fork do projeto, chamado MariaDB, o qual no começo se comprometia a ser compatível com o MySQL, porém totalmente livre em termos de licença. Infelizmente ele já não são 100% compatível com o MySQL, o que talvez seja um problema para algumas empresas ou desenvolvedores (ou não).
+
+Já o PostgreSQL sempre foi open-source e apesar de ter uma licença própria, ela é muito parecida com as licenças BSD e MIT.
+
+6) Preços
+Muita gente não sabe, mas a versão completa do MySQL não é gratuita.
+
+O PostgreSQL por sua vez oferece todas as suas funcionalidades pelo mesmo preço: zero!
+
+Conclusão
+Do jeito que eu listei as comparações aqui, pode parecer que o MySQL é o pior banco de dados do mundo, mas de fato ele está longe disso. O fato de ser tão popular e de tantas empresas usarem e apostarem nele provam isso.
+
+Entretanto, pelos motivos citados acima, PostgreSQL é minha escolha pessoal. Deixe nos comentários abaixo se você concorda ou discorda, discussões (saudáveis) são sempre bem-vindas! ;)
+https://www.lucascaton.com.br/2018/01/31/6-motivos-para-usar-o-postgresql-em-vez-do-mysql/

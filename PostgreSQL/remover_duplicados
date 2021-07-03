@@ -1,0 +1,10 @@
+Remover duplicados
+
+DELETE FROM
+    contas a
+    USING contas b
+WHERE
+    a.id < b.id
+    AND a.grupo = b.grupo
+
+

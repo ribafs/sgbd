@@ -1,0 +1,33 @@
+-- Dump a particular database (all tables)
+Shell> mysqldump -u username -p databaseName > backupFile.sql
+
+-- Dump selected tables of a particular database
+Shell> mysqldump -u username -p databaseName table1Name [table2Name ...] > backupFile.sql
+
+-- Dump several databases with --database option
+shell> mysqldump --databases database1Name [database2Name ...] > backupFile.sql
+
+-- Dump all databases in the server with --all-databases option, except mysql.user table (for security)
+shell> mysqldump -u root -p --all-databases --ignore-table=mysql.user > backupServer.sql
+
+You can restore from the backup by running client "mysql" in batch mode to execute the SQL statements:
+Shell> mysql -u username -p databaseName < backupFile.sql
+or using the source command in an interactive client:
+
+-- Run an mysql interactive client and load in to MySQL server
+mysql> source d:/path/backupfile.sql
+
+Example: The following command backup the table employees and customers of the database southwind_mini.
+Shell> mysqldump -u username -p southwind_mini employees customers > "d:\path\backup.sql"
+Study the output file, which contains CREATE TABLE and INSERT statements to recreate the tables dumped. 
+
+
+mysqlimport performs the same function as "LOAD DATA INFILE" to load data from a text file into a table. "LOAD DATA INFILE" runs inside an interactive client, whereas mysqlimport runs from command-line.
+Shell> mysqlimport databaseName table1Name [table2Name ...]
+
+For example,
+
+Shell> mysqlimport southwind_mini customers.txt employees.txt
+Load the data from "Customer.txt" into table customers, "employees.txt" into table employees of the database southwind_mini. The table name is derived from the file name by ignoring the file extension.
+
+

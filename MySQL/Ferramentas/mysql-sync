@@ -1,0 +1,166 @@
+Sincronizar dois bancos mysql
+
+If you are using Linux, you can use this bash script: (it perhaps needs some additional code cleaning but it works ... and it's much faster then mysqldump|mysql)
+
+#!/bin/bash
+
+DBUSER=user
+DBPASSWORD=pwd
+DBSNAME=sourceDb
+DBNAME=destinationDb
+DBSERVER=db.example.com
+
+fCreateTable=""
+fInsertData=""
+echo "Copying database ... (may take a while ...)"
+DBCONN="-h ${DBSERVER} -u ${DBUSER} --password=${DBPASSWORD}"
+echo "DROP DATABASE IF EXISTS ${DBNAME}" | mysql ${DBCONN}
+echo "CREATE DATABASE ${DBNAME}" | mysql ${DBCONN}
+for TABLE in `echo "SHOW TABLES" | mysql $DBCONN $DBSNAME | tail -n +2`; do
+        createTable=`echo "SHOW CREATE TABLE ${TABLE}"|mysql -B -r $DBCONN $DBSNAME|tail -n +2|cut -f 2-`
+        fCreateTable="${fCreateTable} ; ${createTable}"
+        insertData="INSERT INTO ${DBNAME}.${TABLE} SELECT * FROM ${DBSNAME}.${TABLE}"
+        fInsertData="${fInsertData} ; ${insertData}"
+done;
+echo "$fCreateTable ; $fInsertData" | mysql $DBCONN $DBNAME
+
+
+function cloneDatabase($dbName, $newDbName){
+    global $admin;
+    $db_check = @mysql_select_db ( $dbName );
+    $getTables  =   $admin->query("SHOW TABLES");   
+    $tables =   array();
+    while($row = mysql_fetch_row($getTables)){
+        $tables[]   =   $row[0];
+    }
+    $createTable    =   mysql_query("CREATE DATABASE `$newDbName` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;") or die(mysql_error());
+    foreach($tables as $cTable){
+        $db_check   =   @mysql_select_db ( $newDbName );
+        $create     =   $admin->query("CREATE TABLE $cTable LIKE ".$dbName.".".$cTable);
+        if(!$create) {
+            $error  =   true;
+        }
+        $insert     =   $admin->query("INSERT INTO $cTable SELECT * FROM ".$dbName.".".$cTable);
+    }
+    return !isset($error);
+}
+
+
+// usage
+$clone  = cloneDatabase('dbname','newdbname');  // first: toCopy, second: new database
+
+ou
+All of the prior solutions get at the point a little, however, they just don't copy everything over. I created a PHP function (albeit somewhat lengthy) that copies everything including tables, foreign keys, data, views, procedures, functions, triggers, and events. Here is the code:
+
+/* This function takes the database connection, an existing database, and the new database and duplicates everything in the new database. */
+function copyDatabase($c, $oldDB, $newDB) {
+
+    // creates the schema if it does not exist
+    $schema = "CREATE SCHEMA IF NOT EXISTS {$newDB};";
+    mysqli_query($c, $schema);
+
+    // selects the new schema
+    mysqli_select_db($c, $newDB);
+
+    // gets all tables in the old schema
+    $tables = "SELECT table_name
+               FROM information_schema.tables
+               WHERE table_schema = '{$oldDB}'
+               AND table_type = 'BASE TABLE'";
+    $results = mysqli_query($c, $tables);
+
+    // checks if any tables were returned and recreates them in the new schema, adds the foreign keys, and inserts the associated data
+    if (mysqli_num_rows($results) > 0) {
+
+        // recreates all tables first
+        while ($row = mysqli_fetch_array($results)) {
+            $table = "CREATE TABLE {$newDB}.{$row[0]} LIKE {$oldDB}.{$row[0]}";
+            mysqli_query($c, $table);
+        }
+
+        // resets the results to loop through again
+        mysqli_data_seek($results, 0);
+
+        // loops through each table to add foreign key and insert data
+        while ($row = mysqli_fetch_array($results)) {
+
+            // inserts the data into each table
+            $data = "INSERT IGNORE INTO {$newDB}.{$row[0]} SELECT * FROM {$oldDB}.{$row[0]}";
+
+-------------
+
+
+Actually i wanted to achieve exactly that in PHP but none of the answers here were very helpful so here's my – pretty straightforward – solution using MySQLi:
+
+// Database variables
+
+$DB_HOST = 'localhost';
+$DB_USER = 'root';
+$DB_PASS = '1234';
+
+$DB_SRC = 'existing_db';
+$DB_DST = 'newly_created_db';
+
+
+
+// MYSQL Connect
+
+$mysqli = new mysqli( $DB_HOST, $DB_USER, $DB_PASS ) or die( $mysqli->error );
+
+
+
+// Create destination database
+
+$mysqli->query( "CREATE DATABASE $DB_DST" ) or die( $mysqli->error );
+
+
+
+// Iterate through tables of source database
+
+$tables = $mysqli->query( "SHOW TABLES FROM $DB_SRC" ) or die( $mysqli->error );
+
+while( $table = $tables->fetch_array() ): $TABLE = $table[0];
+
+
+    // Copy table and contents in destination database
+
+    $mysqli->query( "CREATE TABLE $DB_DST.$TABLE LIKE $DB_SRC.$TABLE" ) or die( $mysqli->error );
+    $mysqli->query( "INSERT INTO $DB_DST.$TABLE SELECT * FROM $DB_SRC.$TABLE" ) or die( $mysqli->error );
+
+
+endwhile;
+
+----------------
+
+
+Mysqldump isn't bad solution. Simplest way to duplicate database:
+
+mysqldump -uusername -ppass dbname1 | mysql -uusername -ppass dbname2
+
+Also, you can change storage engine by this way:
+
+mysqldump -uusername -ppass dbname1 | sed 's/InnoDB/RocksDB/' | mysql -uusername -ppass dbname2
+
+https://stackoverflow.com/questions/25794/copy-duplicate-database-without-using-mysqldump
+-----------------
+Me interessa o assunto e fiz uma boa pesquisa:
+
+Concordo que você deve criar um aplicativo que faça isso e o vendedor apenas clique em um botão para fazer.
+Mas veja este artigo. O MySQL Workbench faz isso. Talvez ajude:
+https://www.optimum7.com/blog/programming-2/database-synchronization-revisioning-with-mysql.html
+
+https://www.phpclasses.org/package/10077-PHP-Synchronize-MySQL-databases-tables-between-servers.html
+
+Plugin para WP
+https://wordpress.org/plugins/database-sync/
+
+Como você tem controle total sobre as máquinas pode usar:
+mysqldump -h [server] -u [user] -p[password] db1 | mysql -h [server] -u [user] -p[password] db2
+
+Mais soluções aqui:
+https://stackoverflow.com/questions/25794/copy-duplicate-database-without-using-mysqldump
+
+https://github.com/jgrossi/syncr
+https://sourceforge.net/projects/mysqlsync/
+https://codeinthehole.com/tips/how-to-sync-a-mysql-table-between-two-remote-databases/
+https://www.codeproject.com/Articles/852883/MVP-PHP-Data-Synchronize

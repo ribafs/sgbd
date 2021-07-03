@@ -1,0 +1,37 @@
+Funções definidas pelo usuário
+
+CREATE FUNCTION functionName (parameter[, ...]) RETURNS returnType
+  statements;
+  RETURN value;
+
+DELIMITER //
+CREATE FUNCTION sayHello (name VARCHAR(20)) RETURNS VARCHAR(30)
+BEGIN
+   RETURN CONCAT('Hello, ', name, '!');
+END//
+DELIMITER ;
+
+SELECT sayHello('peter');
+
+Example:
+// Define FUNCTION
+DROP FUNCTION IF EXISTS reorderCostFn;
+DELIMITER //
+
+-- Find the products with `quantity` less than the given `reorderLevel`,
+-- and return the total cost to replenish
+CREATE FUNCTION reorderCostFn (reorderLevel INT) RETURNS DECIMAL(8,2)
+BEGIN
+  SELECT IFNULL(sum(price*(reorderLevel-quantity)), 0) INTO @cost
+  FROM products 
+  WHERE quantity < reorderLevel;
+ 
+  RETURN @cost;
+END//
+
+DELIMITER ;     -- restore the default delimiter ';'
+   
+-- Invoke the function
+SELECT reorderCostFn(5000) AS Cost;
+
+
