@@ -1,0 +1,40 @@
+As consultas em SQL se dividem em
+
+DDL - Data Definition Language - Linguagem de definição de dados
+
+CREATE
+DROP
+ALTER
+TRUNCATE - Remove todas as linhas de uma tabela de uma única vez sem registrar as exclusões de linhas individuais, portanto é mais rápido
+COMMENT
+RENAME
+
+DQL - Data Query Language - Linguagem de consulta de dados
+
+SELECT
+
+DML - Data Manipulation Language - Linguagem de manipulação de dados
+
+INSERT
+UPDATE
+DELETE
+CALL
+EXPLAIN PLAN
+LOCK TABLE
+
+DCL - Data Control Language - Linguagem de controle de dados
+
+GRANT
+REVOKE
+
+DTL, TCL - Transactional Control Language - Linguagem de controle de transações
+
+COMMIT
+SAVEPOINT
+ROLLBACK
+
+https://www.canalti.com.br/banco-de-dados/subgrupos-sql-ddl-dql-dml-dcl-dtl-tcl/
+http://www.thomazrossito.com.br/comandos-dml-ddl-dcl-tcl-sql-server/
+
+Não irei abordar todas, mas apenas as que maisi uso
+
